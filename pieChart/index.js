@@ -1,37 +1,34 @@
 var width = d3.select('svg').attr('width');
 var height = d3.select('svg').attr('height');
 
-var marginLeft = 100;
-var marginTop = 100;
+var marginLeft = 0;
+var marginTop = 0;
+
+var pieX = width/2;
+var pieY = height/2;
 
 var svg = d3.select('svg')
-    .append('g')
-    .attr('transform', 'translate(' + marginLeft + ',' + marginTop + ')');
+            .append('g')
+            .attr('transform', 'translate(' + marginLeft + ',' + marginTop + ')');
+
+var pieGroup = svg.append("g")
+                  .attr('transform', 'translate(' + pieX + ',' + pieY + ')');
 
 //set up scales to position circles using the data
-var scaleX = d3.scalePoint().domain(["16-19", "20-24", "25-34", "35-44", "45-54", "55-64","65+"]).range([0, 600]);
-var scaleY = d3.scaleLinear().domain([0,1200]).range([400, 0]);  //remember that 0,0 is at the top of the screen! 300 is the lowest value on the y axis
+var scaleColor = d3.scaleOrdinal().domain(["16-19", "20-24", "25-34", "35-44", "45-54", "55-64","65+"])
+                                  .range(["red", "orange", "yellow", "lime", "blue", "purple", "magenta"]);
 
 var nestedData = [];
 
-// Add the x Axis
-svg.append("g")
-    .attr('transform','translate(0,400)')  //move the x axis from the top of the y axis to the bottom
-    .call(d3.axisBottom(scaleX));
+var pieRadius = 200;
 
-svg.append("g")
-    .call(d3.axisLeft(scaleY));
+var makeArc = d3.arc()
+                .innerRadius(pieRadius - pieRadius)
+                .outerRadius(pieRadius);
 
-
-//use d3 to create a function to draw the line, and store it in a variable for future use
-//Tell the function how to calculate x and y positions for each point, using your scale functions and the values stored in the data
-//(it doesn't matter that the data hasn't loaded yet, because this function won't run until you call it, and then it will
-//use the data that you pass it using d3)
-var makeArea = d3.area()
-    .x(function(d) { return scaleX(d.age); })
-    .y0( scaleY(0))
-    .y1(function(d) { return scaleY(d.total); });
-
+var makePie = d3.pie()
+                .sort(null)
+                .value(function(d) { return d.total; });
 
 //import the data from the .csv file
 d3.csv('./incomeData.csv', function(dataIn){
@@ -42,30 +39,24 @@ d3.csv('./incomeData.csv', function(dataIn){
 
     var loadData = dataIn;
 
-    svg.append('text')
-        .text('Weekly income by age and gender')
-        .attr('transform','translate(300, -20)')
-        .style('text-anchor','middle');
+    var g = pieGroup.selectAll(".arc")
+                    .data(makePie(loadData))
+                    .enter()
+                    .append("g")
+                    .attr("class", "arc");
 
-    svg.append('text')
-        .text('age group')
-        .attr('transform','translate(260, 440)');
+            g.append("path")
+              .attr("d", makeArc)
+              .attr("fill", function(d) { return  scaleColor(d.data.age); });
 
-    svg.append('text')
-        .text('weekly income')
-        .attr('transform', 'translate(-50,250)rotate(270)');
+    var labelArc = d3.arc()
+                     .innerRadius(pieRadius - 30)
+                     .outerRadius(pieRadius - 30);
 
-    // Add the path
-    svg.append("path")
-                               //skipping .enter(), because we don't want a new path for every point in the dataset!
-        .datum(dataIn)         //datum (not data!) tells d3 that all of the data belongs to a single line
-        .attr("class", "area")
-        .attr("d", makeArea)   //the "d" attribute is just part of how the path element is defined, like "cx" or "cy" for a circle.
-                               //it calls the makeLine function above, and hands it sets of points that the path should contain.
-        .attr('fill','blue')
-        .attr('stroke','none');
+    g.append("text")
+     .attr("transform", function(d) { return "translate(" + labelArc.centroid(d) + ")"  })
+     .attr("dy", ".35em")
+     .attr("text-anchor", "middle")
+     .text(function(d) { return d.data.age });
 
 });
-
-
-

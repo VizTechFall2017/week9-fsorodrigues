@@ -1,0 +1,19 @@
+body{
+    background: gainsboro;
+}
+
+.svgBox {
+    height: 90vh;
+    /*width:100%;*/
+    overflow-x: scroll;
+}
+
+svg{
+    background:white;
+}
+
+.titles {
+  font-weight: bold;
+}
+
+::-webkit-scrollbar {display:none;}

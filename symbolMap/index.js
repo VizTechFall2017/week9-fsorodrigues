@@ -34,27 +34,19 @@ queue()
         .attr('stroke-width',.2);
 
 
-    /*
-    svg.selectAll('circle')
+
+    svg.selectAll('.symbolGroups')
         .data(centroids)       //bind a single data point, with the long lat of Boston
                                                     //note that long is negative because it is a W long point!
         .enter()
-        .append('circle')
-        .attr('cx', function (d){
-            return d.center[0];
-        })
-        .attr('cy', function (d){
-            return d.center[1];
-        })
+        .append('g')
+        .attr("class", "symbolGroups")
+        .attr('transform', function(d) { return "translate(" + albersProjection([d.long, d.lat])[0] + "," + albersProjection([d.long, d.lat])[1] + ")")
         .attr('id',function(d){return d.name})
-        .attr('r', function(d){
-            return sizeScale(stateLookup.get(d.name))
-        })
+        .append("path")
+        .attr("d", symbolData)
         .attr('fill','purple')
+        .attr("transform", "scale(.15)")
         .attr('fill-opacity',.7);
-    */
 
   });
-
-
-

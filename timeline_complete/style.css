@@ -1,0 +1,16 @@
+body{
+    background: gainsboro;
+}
+
+.svgBox {
+    height:400px;
+    width:100%;
+    overflow-y: scroll;
+}
+
+svg{
+    background:white;
+}
+
+::-webkit-scrollbar {display:none;}
+
