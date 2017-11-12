@@ -1,4 +1,17 @@
 .svgBox {
-    width:100vw;
-    height: 100vh;
+    width:98vw;
+    height: 98vh;
+}
+
+.tooltip {
+  position: absolute;
+  text-align: center;
+  padding: .5%;
+  font-family: Verdana;
+  font-size: 12pt;
+  color: rgb(250, 250, 250);
+  border: 0px;
+  border-radius: 15%;
+  pointer-events: none;
+  background: black;
 }

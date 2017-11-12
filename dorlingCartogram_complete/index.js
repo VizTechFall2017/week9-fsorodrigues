@@ -10,7 +10,7 @@ var svg = d3.select('svg')
 
 //set up the projection for the map
 var albersProjection = d3.geoAlbersUsa()  //tell it which projection to use
-    .scale(700)                           //tell it how big the map should be
+    .scale(1200)                           //tell it how big the map should be
     .translate([(width/2), (height/2)]);  //set the center of the map to show up in the center of the screen
 
 //set up the path generator function to draw the map outlines
@@ -20,6 +20,11 @@ path = d3.geoPath()
 var stateLookup = d3.map();
 
 var sizeScale = d3.scaleLinear().range([0, 50]);
+
+var div = d3.select("body")
+            .append("div")
+            .attr("class", "tooltip")
+            .style("opacity", 0);
 
 queue()
     .defer(d3.json, "./cb_2016_us_state_20m.json")
@@ -47,12 +52,8 @@ queue()
             return {name: feature.properties.NAME, center: path.centroid(feature)};
     });
 
-
-    //noPR = centroids.filter(function(d) { return !isNaN(d.center[0]); });
-
     svg.selectAll('circle')
-        .data(centroids)       //bind a single data point, with the long lat of Boston
-                                                    //note that long is negative because it is a W long point!
+        .data(centroids)
         .enter()
         .append('circle')
         .attr('cx', function (d){
@@ -66,9 +67,17 @@ queue()
             return sizeScale(stateLookup.get(d.name))
         })
         .attr('fill','purple')
-        .attr('fill-opacity',.7);
+        .attr('fill-opacity',.7)
+        .on("mouseover", function(d) {
+              div.transition()
+                  .duration(200)
+                  .style("opacity", .9);
+               div.html(d.name)
+                  .style("left", (d3.event.pageX) + "px")
+                  .style("top", (d3.event.pageY - 30) + "px")
+        })
+        .on("mouseout", function(d) {
+              div.style("opacity", 0);
+        });
 
   });
-
-
-
